@@ -12,7 +12,7 @@ SPACE_WIDTH = 10
 KEY_WIDTH = (GAME_WIDTH / 14)-SPACE_WIDTH
 KEY_HEIGHT = 250
 
-keyLabels = {"C1", "D1", "E1", "F1", "G1", "A1", "B1", "C2", "D2", "E2", "F2", "G2", "A2", "B2"}
+keyLabels = ["C1", "D1", "E1", "F1", "G1", "A1", "B1", "C2", "D2", "E2", "F2", "G2", "A2", "B2"]
 
 
 pygame.init()    
@@ -27,7 +27,7 @@ def draw():
         key = pygame.Rect(0 + (KEY_WIDTH + SPACE_WIDTH) * i , GAME_HEIGHT - KEY_HEIGHT, KEY_WIDTH, KEY_HEIGHT)
         pygame.draw.rect(window, (255, 255, 255), key)  # key fill
         key_font = pygame.font.SysFont('Gill Sans', 25)
-        key_text = key_font.render("C", True, (175, 175, 175))
+        key_text = key_font.render(keyLabels[i], True, 'gray')
         window.blit(key_text, (i * (KEY_WIDTH + SPACE_WIDTH) + KEY_WIDTH/2, KEY_HEIGHT *2))
 
 while True: # game loop
