@@ -16,6 +16,63 @@ KEY_HEIGHT = 250
 whiteKeyLabels = ["C1", "D1", "E1", "F1", "G1", "A1", "B1", "C2", "D2", "E2", "F2", "G2", "A2", "B2"]
 blackKeyLabels = ["C#1", "D#1","", "F#1", "G#1", "A#1","", "C#2", "D#2","", "F#2", "G#2", "A#2", ""]
 
+C1sound = pygame.mixer.Sound("C1.mp3")
+Csharp1sound = pygame.mixer.Sound("C#1.mp3")
+D1sound = pygame.mixer.Sound("D1.mp3")
+Dsharp1sound = pygame.mixer.Sound("D#1.mp3")
+E1sound = pygame.mixer.Sound("E1.mp3")
+F1sound = pygame.mixer.Sound("F1.mp3")
+Fsharp1sound = pygame.mixer.Sound("F#1.mp3")
+G1sound = pygame.mixer.Sound("G1.mp3")
+Gsharp1sound = pygame.mixer.Sound("G#1.mp3")
+A1sound = pygame.mixer.Sound("A1.mp3")
+Asharp1sound = pygame.mixer.Sound("A#1.mp3")
+B1sound = pygame.mixer.Sound("B1.mp3")
+C2sound = pygame.mixer.Sound("C2.mp3")
+Csharp2sound = pygame.mixer.Sound("C#2.mp3")
+D2sound = pygame.mixer.Sound("D2.mp3")
+Dsharp2sound = pygame.mixer.Sound("D#2.mp3")
+E2sound = pygame.mixer.Sound("E2.mp3")
+F2sound = pygame.mixer.Sound("F2.mp3")
+Fsharp2sound = pygame.mixer.Sound("F#2.mp3")
+G2sound = pygame.mixer.Sound("G2.mp3")
+Gsharp2sound = pygame.mixer.Sound("G#2.mp3")
+A2sound = pygame.mixer.Sound("A2.mp3")
+Asharp2sound = pygame.mixer.Sound("A#2.mp3")
+B2sound = pygame.mixer.Sound("B2.mp3")
+
+
+
+
+keySounds = {
+    pygame.K_TAB: C1sound,
+    pygame.K_1: Csharp1sound,
+    pygame.K_q: D1sound,
+    pygame.K_2: Dsharp1sound,
+    pygame.K_w: E1sound,
+    pygame.K_e: F1sound,
+    pygame.K_4: Fsharp1sound,
+    pygame.K_r: G1sound,
+    pygame.K_5: Gsharp1sound,
+    pygame.K_t: A1sound,
+    pygame.K_6: Asharp1sound,
+    pygame.K_y: B1sound,
+    pygame.K_u: C2sound,
+    pygame.K_8: Csharp2sound,
+    pygame.K_i: D2sound,
+    pygame.K_9: Dsharp2sound,
+    pygame.K_o: E2sound,
+    pygame.K_p: F2sound,
+    # pygame.K_-: Fsharp2sound,
+    # pygame.K_: G2sound,
+    # pygame.K_5: Gsharp2sound,
+    # pygame.K_t: A2sound,
+    # pygame.K_6: Asharp2sound,
+    # pygame.K_y: B2sound,
+}
+
+
+
 
 pygame.init()    
 window = pygame.display.set_mode((GAME_WIDTH, GAME_HEIGHT))
@@ -43,6 +100,9 @@ while True: # game loop
         if event.type == pygame.QUIT: # if click X button on window
             pygame.quit()
             exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key in keySounds:
+                keySounds[event.key].play()
 
     draw()
     pygame.display.update()
