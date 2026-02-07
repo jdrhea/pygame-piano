@@ -40,8 +40,10 @@ Gsharp2sound = pygame.mixer.Sound("G#2.mp3")
 A2sound = pygame.mixer.Sound("A2.mp3")
 Asharp2sound = pygame.mixer.Sound("A#2.mp3")
 B2sound = pygame.mixer.Sound("B2.mp3")
+whiteSounds = [C1sound, D1sound, E1sound, F1sound, G1sound, A1sound, B1sound, C2sound, D2sound, E2sound, F2sound, G2sound, A2sound, B2sound]
+blackSounds = [Csharp1sound, Dsharp1sound, None, Fsharp1sound, Gsharp1sound, Asharp1sound, None, Csharp2sound, Dsharp2sound, None, Fsharp2sound, Gsharp2sound, Asharp2sound, None]
 
-
+activeKeys = []
 
 
 keySounds = {
@@ -63,13 +65,16 @@ keySounds = {
     pygame.K_9: Dsharp2sound,
     pygame.K_o: E2sound,
     pygame.K_p: F2sound,
-    # pygame.K_-: Fsharp2sound,
-    # pygame.K_: G2sound,
-    # pygame.K_5: Gsharp2sound,
-    # pygame.K_t: A2sound,
-    # pygame.K_6: Asharp2sound,
-    # pygame.K_y: B2sound,
+    pygame.K_MINUS: Fsharp2sound,
+    pygame.K_LEFTBRACKET: G2sound,
+    pygame.K_PLUS: Gsharp2sound,
+    pygame.K_RIGHTBRACKET: A2sound,
+    pygame.K_BACKSPACE: Asharp2sound,
+    pygame.K_BACKSLASH: B2sound,
 }
+whitekeys = []
+blackkeys = []
+
 
 
 
@@ -80,20 +85,29 @@ pygame.display.set_caption('Pygame Piano')
 clock = pygame.time.Clock()
 
 
-
-def draw():
+def drawKeys():
     for i in range(0, 14):
         key = pygame.Rect((KEY_WIDTH + SPACE_WIDTH) * i , GAME_HEIGHT - KEY_HEIGHT, KEY_WIDTH, KEY_HEIGHT)
-        pygame.draw.rect(window, (255, 255, 255), key)  # key fill
+        if key in activeKeys:
+            pygame.draw.rect(window, (0, 200, 0), key)  # green when active
+        else:
+            pygame.draw.rect(window, ("white"), key)  # white when inactive
+        whitekeys.append(key)
         key_font = pygame.font.SysFont('Gill Sans', 25)
         key_text = key_font.render(whiteKeyLabels[i], True, 'gray')
         window.blit(key_text, (i * (KEY_WIDTH + SPACE_WIDTH) + KEY_WIDTH/2, KEY_HEIGHT *2))
     for i in chain(range(0, 2), range(3, 6), range(7,9), range(10,13)):
         blackKey = pygame.Rect(3/4*KEY_WIDTH + (KEY_WIDTH + SPACE_WIDTH)*i, GAME_HEIGHT - KEY_HEIGHT, KEY_WIDTH/2, KEY_HEIGHT/2)
-        pygame.draw.rect(window, (50, 50, 50), blackKey)  # key fill
+        if blackKey in activeKeys:
+            pygame.draw.rect(window, (0, 100, 0), blackKey)  # green when active
+        else:
+            pygame.draw.rect(window, (50, 50, 50), blackKey)  # gray when inactive
+        blackkeys.append(blackKey)
         blackKey_font = pygame.font.SysFont('Gill Sans', 24)
         key_text = blackKey_font.render(blackKeyLabels[i], True, 'gray')
         window.blit(key_text, (3/4*KEY_WIDTH + (KEY_WIDTH + SPACE_WIDTH)*i, KEY_HEIGHT+KEY_HEIGHT/2))
+
+
 
 while True: # game loop
     for event in pygame.event.get():
@@ -103,7 +117,21 @@ while True: # game loop
         if event.type == pygame.KEYDOWN:
             if event.key in keySounds:
                 keySounds[event.key].play()
-
-    draw()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for i in range(0, 14):
+                if whitekeys[i].collidepoint(event.pos):
+                    whiteSounds[i].play()
+                    activeKeys.append(whitekeys[i])
+            black_indices = [0,1,3,4,5,7,8,10,11,12]
+            for idx in range(len(black_indices)):
+                if blackkeys[idx].collidepoint(event.pos):
+                    sound = blackSounds[black_indices[idx]]
+                    if sound:
+                        sound.play()
+                    activeKeys.append(blackkeys[idx])
+        if event.type == pygame.MOUSEBUTTONUP:
+            activeKeys.clear()
+    # Create keys once
+    drawKeys()
     pygame.display.update()
     clock.tick(60)  # Limit the frame rate to 60 FPS
