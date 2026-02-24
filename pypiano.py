@@ -117,6 +117,7 @@ while True: # game loop
         if event.type == pygame.KEYDOWN:
             if event.key in keySounds:
                 keySounds[event.key].play()
+                activeKeys.append(event.key)
         if event.type == pygame.MOUSEBUTTONDOWN:
             for i in range(0, 14):
                 if whitekeys[i].collidepoint(event.pos):
@@ -133,5 +134,6 @@ while True: # game loop
             activeKeys.clear()
     # Create keys once
     drawKeys()
+    print(activeKeys)
     pygame.display.update()
     clock.tick(60)  # Limit the frame rate to 60 FPS
