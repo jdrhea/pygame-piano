@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 from itertools import chain
+import time
 
 pygame.init()
 pygame.mixer.init()
@@ -44,6 +45,7 @@ whiteSounds = [C1sound, D1sound, E1sound, F1sound, G1sound, A1sound, B1sound, C2
 blackSounds = [Csharp1sound, Dsharp1sound, None, Fsharp1sound, Gsharp1sound, Asharp1sound, None, Csharp2sound, Dsharp2sound, None, Fsharp2sound, Gsharp2sound, Asharp2sound, None]
 
 activeKeys = []
+activeNotes = []
 
 
 keySounds = {
@@ -78,7 +80,6 @@ blackkeys = []
 
 
 
-
 pygame.init()    
 window = pygame.display.set_mode((GAME_WIDTH, GAME_HEIGHT))
 pygame.display.set_caption('Pygame Piano')
@@ -86,6 +87,8 @@ clock = pygame.time.Clock()
 
 
 def drawKeys():
+    whitekeys.clear()
+    blackkeys.clear()
     for i in range(0, 14):
         key = pygame.Rect((KEY_WIDTH + SPACE_WIDTH) * i , GAME_HEIGHT - KEY_HEIGHT, KEY_WIDTH, KEY_HEIGHT)
         if key in activeKeys:
@@ -106,10 +109,25 @@ def drawKeys():
         blackKey_font = pygame.font.SysFont('Gill Sans', 24)
         key_text = blackKey_font.render(blackKeyLabels[i], True, 'gray')
         window.blit(key_text, (3/4*KEY_WIDTH + (KEY_WIDTH + SPACE_WIDTH)*i, KEY_HEIGHT+KEY_HEIGHT/2))
+def drawNote():
+    for x, w, c, h, s in activeNotes:
+        white_note = pygame.Rect(x, GAME_HEIGHT - KEY_HEIGHT-h, w, h)
+        pygame.draw.rect(window, c, white_note)
 
-
+def drawNoteatX(x, w, c):
+    activeNotes.append([x, w, c, 1, False])
 
 while True: # game loop
+    growth = 500
+    dt = clock.tick(60) / 1000.0
+    for note in activeNotes:
+        if note[4]:  # shrinking
+            note[3] += 0
+            note[4] += growth * dt
+        else:
+            note[3] += growth * dt
+    # remove notes that are no longer visible
+    activeNotes = [note for note in activeNotes if note[3] > 1]
     for event in pygame.event.get():
         if event.type == pygame.QUIT: # if click X button on window
             pygame.quit()
@@ -119,10 +137,13 @@ while True: # game loop
                 keySounds[event.key].play()
                 activeKeys.append(event.key)
         if event.type == pygame.MOUSEBUTTONDOWN:
+            # when pressing a key, start new note growth state as expanding
+            # and keep old active notes unchanged
             for i in range(0, 14):
                 if whitekeys[i].collidepoint(event.pos):
                     whiteSounds[i].play()
                     activeKeys.append(whitekeys[i])
+                    drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(0,0,255))
             black_indices = [0,1,3,4,5,7,8,10,11,12]
             for idx in range(len(black_indices)):
                 if blackkeys[idx].collidepoint(event.pos):
@@ -130,10 +151,13 @@ while True: # game loop
                     if sound:
                         sound.play()
                     activeKeys.append(blackkeys[idx])
+                    drawNoteatX(blackkeys[idx].x, w=KEY_WIDTH/2, c=(0,0,175))
         if event.type == pygame.MOUSEBUTTONUP:
             activeKeys.clear()
-    # Create keys once
+            for note in activeNotes:
+                note[4] = True
+    window.fill((0, 0, 0))
+    drawNote()
     drawKeys()
-    print(activeKeys)
     pygame.display.update()
-    clock.tick(60)  # Limit the frame rate to 60 FPS
+    #clock.tick(60)  # Limit the frame rate to 60 FPS
