@@ -110,20 +110,20 @@ def drawKeys():
         key_text = blackKey_font.render(blackKeyLabels[i], True, 'gray')
         window.blit(key_text, (3/4*KEY_WIDTH + (KEY_WIDTH + SPACE_WIDTH)*i, KEY_HEIGHT+KEY_HEIGHT/2))
 def drawNote():
-    for x, w, c, h, s in activeNotes:
-        white_note = pygame.Rect(x, GAME_HEIGHT - KEY_HEIGHT-h, w, h)
+    for x, w, c, h, s, t in activeNotes:
+        white_note = pygame.Rect(x, GAME_HEIGHT - KEY_HEIGHT-t, w, h)
         pygame.draw.rect(window, c, white_note)
 
 def drawNoteatX(x, w, c):
-    activeNotes.append([x, w, c, 1, False])
+    activeNotes.append([x, w, c, 1, False, 0])
 
 while True: # game loop
-    growth = 500
-    dt = clock.tick(60) / 1000.0
+    growth = 250
+    dt = clock.tick(120) / 1000.0
     for note in activeNotes:
         if note[4]:  # shrinking
             note[3] += 0
-            note[4] += growth * dt
+            note[5] += growth * dt
         else:
             note[3] += growth * dt
     # remove notes that are no longer visible
