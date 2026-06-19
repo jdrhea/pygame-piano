@@ -126,6 +126,7 @@ while True: # game loop
             note[5] += growth * dt
         else:
             note[3] += growth * dt
+            note[5] += growth * dt
     # remove notes that are no longer visible
     activeNotes = [note for note in activeNotes if note[3] > 1]
     for event in pygame.event.get():
@@ -157,7 +158,7 @@ while True: # game loop
             for note in activeNotes:
                 note[4] = True
     window.fill((0, 0, 0))
-    drawNote()
     drawKeys()
+    drawNote()
     pygame.display.update()
     #clock.tick(60)  # Limit the frame rate to 60 FPS
