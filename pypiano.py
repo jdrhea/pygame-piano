@@ -140,7 +140,7 @@ while True: # game loop
             note[5] += growth * dt
     for t in timeList:
         if t[2]:
-            t[1] += 0
+            t[1] += dt
         else:
             t[1] += dt
     # remove notes that are no longer visible
@@ -167,9 +167,10 @@ while True: # game loop
                     whiteSounds[i].play()
                     activeKeys.append(whitekeys[i])
                     drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(0,0,255))
-                    defineTimer(whitekeys[i])
-                    startTimer()
-                    print(recorded, recordedTimes)
+                    if isRecording:
+                        defineTimer(whitekeys[i])
+                        startTimer()
+                        print(recorded, recordedTimes)
 
             black_indices = [0,1,3,4,5,7,8,10,11,12]
             for idx in range(len(black_indices)):
