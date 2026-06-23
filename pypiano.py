@@ -47,8 +47,7 @@ blackSounds = [Csharp1sound, Dsharp1sound, None, Fsharp1sound, Gsharp1sound, Ash
 activeKeys = []
 activeNotes = []
 recorded = []
-recordedTimes = []
-timeList= []
+recordedValues = []
 
 
 keySounds = {
@@ -117,12 +116,34 @@ def drawNote():
     for x, w, c, h, s, t in activeNotes:
         white_note = pygame.Rect(x, GAME_HEIGHT - KEY_HEIGHT-t, w, h)
         pygame.draw.rect(window, c, white_note)
-def startTimer():
-    for note,time,cap in timeList:
-        recordedTimes.append(time)
-        recorded.append(note)
-def defineTimer(note):
-    timeList.append([note,0, False])
+class RecordNote:
+    def __init__(self, note):
+        self.startTime = time.time()
+        self.endTime = None
+        self.finished = False
+        self.note = note
+        self.duration = 0
+    def capTimer(self):
+        if not self.finished:
+            self.finished = True
+            self.endTime = time.time()
+            self.duration = self.endTime - self.startTime
+    def data(self):
+        return self.duration, self.note
+class RecordRest:
+    def __init__(self):
+        self.startTime = time.time()
+        self.endTime = None
+        self.finished = False
+        self.duration = 0
+    def capRestTimer(self):
+        if not self.finished:
+            self.finished = True
+            self.endTime = time.time()
+            self.duration = self.endTime - self.startTime
+    def data(self):
+        return self.duration, None
+        
     
 
 def drawNoteatX(x, w, c):
@@ -138,11 +159,6 @@ while True: # game loop
         else:
             note[3] += growth * dt
             note[5] += growth * dt
-    for t in timeList:
-        if t[2]:
-            t[1] += dt
-        else:
-            t[1] += dt
     # remove notes that are no longer visible
     activeNotes = [note for note in activeNotes if note[3] > 1]
     keys = pygame.key.get_pressed()
@@ -166,11 +182,16 @@ while True: # game loop
                 if whitekeys[i].collidepoint(event.pos):
                     whiteSounds[i].play()
                     activeKeys.append(whitekeys[i])
-                    drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(0,0,255))
                     if isRecording:
-                        defineTimer(whitekeys[i])
-                        startTimer()
-                        print(recorded, recordedTimes)
+                        drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(255,0,0))
+                    else:
+                        drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(0,0,255))
+                    for record in recorded:
+                        if hasattr(record, "capRestTimer"):
+                            record.capRestTimer()
+                    if isRecording:
+                        recorded.append(RecordNote(whitekeys[i]))
+                    
 
             black_indices = [0,1,3,4,5,7,8,10,11,12]
             for idx in range(len(black_indices)):
@@ -180,13 +201,23 @@ while True: # game loop
                         sound.play()
                     activeKeys.append(blackkeys[idx])
                     drawNoteatX(blackkeys[idx].x, w=KEY_WIDTH/2, c=(0,0,175))
-                    recorded.append(blackkeys[idx])
+                    for record in recorded:
+                        if hasattr(record, "capRestTimer"):
+                            record.capRestTimer()
+                    if isRecording:
+                        recorded.append(RecordNote(blackkeys[idx]))
         if event.type == pygame.MOUSEBUTTONUP:
+            for record in recorded:
+                if hasattr(record, "capTimer"):
+                    record.capTimer()
+            if isRecording:
+                recorded.append(RecordRest())
             activeKeys.clear()   
             for note in activeNotes:
                 note[4] = True
-            for t in timeList:
-                t[2] = True
+            recordedValues = [r.data() for r in recorded]
+            print(recordedValues)
+                
             
 
     window.fill((0, 0, 0))
