@@ -118,29 +118,21 @@ def drawNote():
         pygame.draw.rect(window, c, white_note)
 class RecordNote:
     def __init__(self, note):
-        self.startTime = time.time()
-        self.endTime = None
         self.finished = False
         self.note = note
         self.duration = 0
-    def capTimer(self):
+    def update(self,dt):
         if not self.finished:
-            self.finished = True
-            self.endTime = time.time()
-            self.duration = self.endTime - self.startTime
+            self.duration += dt
     def data(self):
         return self.duration, self.note
 class RecordRest:
     def __init__(self):
-        self.startTime = time.time()
-        self.endTime = None
         self.finished = False
         self.duration = 0
-    def capRestTimer(self):
+    def update(self, dt):
         if not self.finished:
-            self.finished = True
-            self.endTime = time.time()
-            self.duration = self.endTime - self.startTime
+            self.duration += dt
     def data(self):
         return self.duration, None
         
@@ -186,9 +178,6 @@ while True: # game loop
                         drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(255,0,0))
                     else:
                         drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(0,0,255))
-                    for record in recorded:
-                        if hasattr(record, "capRestTimer"):
-                            record.capRestTimer()
                     if isRecording:
                         recorded.append(RecordNote(whitekeys[i]))
                     
@@ -201,15 +190,9 @@ while True: # game loop
                         sound.play()
                     activeKeys.append(blackkeys[idx])
                     drawNoteatX(blackkeys[idx].x, w=KEY_WIDTH/2, c=(0,0,175))
-                    for record in recorded:
-                        if hasattr(record, "capRestTimer"):
-                            record.capRestTimer()
                     if isRecording:
                         recorded.append(RecordNote(blackkeys[idx]))
         if event.type == pygame.MOUSEBUTTONUP:
-            for record in recorded:
-                if hasattr(record, "capTimer"):
-                    record.capTimer()
             if isRecording:
                 recorded.append(RecordRest())
             activeKeys.clear()   
@@ -217,7 +200,8 @@ while True: # game loop
                 note[4] = True
             recordedValues = [r.data() for r in recorded]
             print(recordedValues)
-                
+    for record in recorded:
+        record.update(dt)
             
 
     window.fill((0, 0, 0))
