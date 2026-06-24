@@ -1,7 +1,6 @@
 import pygame
 from sys import exit
 from itertools import chain
-import time
 
 pygame.init()
 pygame.mixer.init()
@@ -179,8 +178,9 @@ while True: # game loop
                     else:
                         drawNoteatX(whitekeys[i].x, w=KEY_WIDTH, c=(0,0,255))
                     if isRecording:
+                        if recorded and isinstance(recorded[-1], RecordRest):
+                            recorded[-1].finished = True
                         recorded.append(RecordNote(whitekeys[i]))
-                    
 
             black_indices = [0,1,3,4,5,7,8,10,11,12]
             for idx in range(len(black_indices)):
@@ -191,9 +191,13 @@ while True: # game loop
                     activeKeys.append(blackkeys[idx])
                     drawNoteatX(blackkeys[idx].x, w=KEY_WIDTH/2, c=(0,0,175))
                     if isRecording:
+                        if recorded and isinstance(recorded[-1], RecordRest):
+                            recorded[-1].finished = True
                         recorded.append(RecordNote(blackkeys[idx]))
         if event.type == pygame.MOUSEBUTTONUP:
             if isRecording:
+                if recorded and isinstance(recorded[-1], RecordNote):
+                    recorded[-1].finished = True
                 recorded.append(RecordRest())
             activeKeys.clear()   
             for note in activeNotes:
